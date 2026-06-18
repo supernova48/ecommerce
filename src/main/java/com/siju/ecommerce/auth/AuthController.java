@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -33,7 +33,7 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse login(
             @Valid @RequestBody LoginRequest request) {
-        logger.info("Attempting login for user: {}", request.username());
+        logger.debug("Attempting login for user: {}", request.username());
         return authService.login(request.username(), request.password());
     }
 }
