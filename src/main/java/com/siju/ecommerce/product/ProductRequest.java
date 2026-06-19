@@ -10,6 +10,7 @@ public record ProductRequest(
 
     @NotBlank(message = "Product name is required")
     String name,
+    
     String description,
     
     @NotNull(message = "Price is required")

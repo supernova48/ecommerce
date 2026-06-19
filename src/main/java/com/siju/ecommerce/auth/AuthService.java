@@ -1,5 +1,7 @@
 package com.siju.ecommerce.auth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final static Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
@@ -46,10 +49,11 @@ public class AuthService {
 
     public LoginResponse login(String username, String password) {
         // Implement login logic here
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
+
+        logger.debug("Does Password match: {}", (passwordEncoder.matches(password, user.getPasswordHash())));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         String accessToken = jwtService.generateToken(user);
         return new LoginResponse(accessToken);
