@@ -48,9 +48,12 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<PageResponse<ProductResponse>> getProducts(
             @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+        ) {
 
-        PageResponse<ProductResponse> pageResponse = productService.getProducts(pageNumber, pageSize);
+        PageResponse<ProductResponse> pageResponse = productService.getProducts(pageNumber, pageSize, sortBy, direction);
         return ResponseEntity.ok(pageResponse);
     }
 

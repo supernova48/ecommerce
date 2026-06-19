@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.siju.ecommerce.common.PageResponse;
@@ -19,18 +20,22 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
 
-
     @Transactional
     public ProductResponse createProduct(ProductRequest request) {
-     
+
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
         return productMapper.toResponse(savedProduct);
     }
 
+    public PageResponse<ProductResponse> getProducts(int pageNumber,
+            int pageSize, String sortBy, String direction) {
 
-    public PageResponse<ProductResponse> getProducts(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Sort sort = direction.equalsIgnoreCase("asc") ? 
+        Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<Product> productPage = productRepository.findAll(pageable);
 
         List<ProductResponse> content = productPage.getContent().stream()
@@ -44,7 +49,6 @@ public class ProductService {
                 productPage.getTotalElements(),
                 productPage.getTotalPages(),
                 productPage.isFirst(),
-                productPage.isLast()
-        );
+                productPage.isLast());
     }
 }
