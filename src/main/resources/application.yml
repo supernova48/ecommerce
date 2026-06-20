@@ -12,7 +12,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
   flyway:
     enabled: true    
 
@@ -20,3 +23,8 @@ jwt:
   secret: ZWNvbW1lcmNlLXNwcmluZy1ib290LWp3dC1zZWNyZXQta2V5LWZvci1kZXZlbG9wbWVudA==
   expiration: 3600000 # 1 hour in milliseconds
   
+app:
+  pagination:
+    slice-enabled-for:
+      - product  
+    

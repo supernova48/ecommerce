@@ -11,7 +11,8 @@ public class ProductMapper {
                 product.getDescription(),
                 product.getPrice(),
                 product.getStockQuantity(),
-                product.getActive());
+                product.getActive(),
+                product.getCategory());
     }
 
 
@@ -21,7 +22,8 @@ public class ProductMapper {
         product.setDescription(request.description());
         product.setPrice(request.price());
         product.setStockQuantity(request.stockQuantity());
-        product.setActive(request.active()); // Set the product as active by default
+        product.setActive(request.active());
+        product.setCategory(request.category());
         return product;
     }
 }

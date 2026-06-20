@@ -2,6 +2,8 @@ package com.siju.ecommerce.product;
 
 import java.math.BigDecimal;
 
+import com.siju.ecommerce.category.ProductCategory;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -21,8 +23,10 @@ public record ProductRequest(
     Integer stockQuantity,
 
     @NotNull(message = "Active status is required")
-    Boolean active
+    Boolean active,
 
+    @NotNull(message = "Category is required")
+    ProductCategory category
     
 ) 
 

@@ -2,15 +2,15 @@ package com.siju.ecommerce.common;
 
 import java.util.List;
 
-public record PageResponse <T>  (
+
+public record SliceResponse<T>  (
 
     List<T> content,
     int pageNumber,
-    int pageSize,   
-    long totalElements,
-    int totalPages,
+    int pageSize,
     boolean first,
-    boolean last    
+    boolean last,
+    boolean hasNext
 
 ) implements PaginationResponse<T>
 

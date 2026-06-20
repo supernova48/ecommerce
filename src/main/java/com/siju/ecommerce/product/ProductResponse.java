@@ -2,6 +2,8 @@ package com.siju.ecommerce.product;
 
 import java.math.BigDecimal;
 
+import com.siju.ecommerce.category.ProductCategory;
+
 
 public record ProductResponse(
         Long id,
@@ -9,7 +11,8 @@ public record ProductResponse(
         String description,
         BigDecimal price,
         Integer stockQuantity,
-        Boolean active
+        Boolean active,
+        ProductCategory category
 
 )
 
