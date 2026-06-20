@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,9 @@ public class ProductService {
 
         if (useSlice(PRODUCT)) {
             logger.debug("slice used for {}", PRODUCT);
+            logger.debug("""
+                    Fetching products with pageNumber: {}, pageSize: {}, sortBy: {},
+                    direction: {} from database""", pageNumber, pageSize, sortBy, direction);
             Slice<Product> productSlice = productRepository.findBy(pageable);
             List<ProductResponse> content = productSlice.getContent()
                     .stream().map(productMapper::toResponse).toList();
@@ -59,6 +63,10 @@ public class ProductService {
 
         }
         logger.debug("slice NOT used for {}", PRODUCT);
+        logger.debug("""
+                Fetching products with pageNumber: {},
+                pageSize: {}, sortBy: {}, direction: {} from database
+                """, pageNumber, pageSize, sortBy, direction);
         Page<Product> productPage = productRepository.findAll(pageable);
 
         List<ProductResponse> content = productPage.getContent().stream()
@@ -79,7 +87,10 @@ public class ProductService {
             int pageNumber, int pageSize, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-
+        logger.debug("""
+                Fetching products with name containing: {} from database with pageNumber:
+                 {}, pageSize: {}, sortBy: {}, direction: {}
+                 """, keyword, pageNumber, pageSize, sortBy, direction);
         Page<Product> productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
 
         List<ProductResponse> content = productPage.getContent().stream()
@@ -96,15 +107,19 @@ public class ProductService {
     @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
 
-        logger.debug("Fetching product with id: {}", id);
+        logger.debug("Fetching product with id: {} from database", id);
         Optional<Product> productOptional = productRepository.findById(id);
 
         Product product = productOptional.orElseThrow(() -> new ProductNotFoundException(id));
         return productMapper.toResponse(product);
     }
 
-    @CacheEvict(value = "products", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id")
+
+    })
     public ProductResponse updateProduct(Long id, ProductRequest request) {
+        logger.debug("Fetching product with id: {} from database for update", id);
         Optional<Product> productOptional = productRepository.findById(id);
         Product existingProduct = productOptional.orElseThrow(() -> new ProductNotFoundException(id));
 
@@ -119,7 +134,9 @@ public class ProductService {
         return productMapper.toResponse(updatedProduct);
     }
 
-    @CacheEvict(value = "products", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id")
+    })
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
@@ -127,17 +144,21 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public PaginationResponse<ProductResponse> getProductsByCategory(ProductCategory category, int pageNumber,
+    public PaginationResponse<ProductResponse> getProductsByCategory(
+            ProductCategory category, int pageNumber,
             int pageSize, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-
+        logger.debug("""
+                Fetching products for category: {} from database with pageNumber:
+                 {}, pageSize: {}, sortBy: {}, direction: {}
+                 """, category, pageNumber, pageSize, sortBy, direction);
         Page<Product> productPage = productRepository.findByCategory(category, pageable);
-        List<ProductResponse> content = productPage.getContent().stream().map(productMapper::toResponse).toList();     
-        return new PageResponse<>(content, productPage.getNumber(),  
-        productPage.getSize(), productPage.getTotalElements(), 
-        productPage.getTotalPages(), productPage.isFirst(), 
-        productPage.isLast());  
+        List<ProductResponse> content = productPage.getContent().stream().map(productMapper::toResponse).toList();
+        return new PageResponse<>(content, productPage.getNumber(),
+                productPage.getSize(), productPage.getTotalElements(),
+                productPage.getTotalPages(), productPage.isFirst(),
+                productPage.isLast());
     }
 
     private boolean useSlice(String tableName) {

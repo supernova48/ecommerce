@@ -45,6 +45,10 @@ public class ProductController {
      * }
      */
 
+    
+    
+    
+    
     @PostMapping
     @Operation(
         summary = "Create product", 
@@ -61,6 +65,14 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 
+    
+    
+    
+    
+    
+    @Operation(summary = "Get products with pagination and sorting", description = """
+        Retrieves a paginated list of products with optional sorting parameters.
+        Clients can specify page number, page size, sorting field, and sorting direction.""")
     @GetMapping
     public ResponseEntity<PaginationResponse<ProductResponse>> getProducts(
             @RequestParam(defaultValue = "0") int pageNumber,
@@ -73,6 +85,13 @@ public class ProductController {
         return ResponseEntity.ok(paginationResponse);
     }
 
+    
+    
+    
+    
+    @Operation(summary = "Get products by name with pagination and sorting", description = """
+        Retrieves a paginated list of products that match the specified keyword with product names.
+        Clients can specify page number, page size, sorting field, and sorting direction.""")
     @GetMapping(params = "keyword")
     public ResponseEntity<PaginationResponse<ProductResponse>> getProductByName(
             @RequestParam String keyword,
@@ -87,6 +106,15 @@ public class ProductController {
         return ResponseEntity.ok(paginationResponse);
     }
 
+    
+    
+    
+    
+    
+    
+    @Operation(summary = "Get product by ID", description = """
+        Retrieves a single product by its unique identifier. Returns the product details if found, 
+        or a 404 Not Found status if no product exists with the specified ID.""")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         logger.debug("Entering @GetMapping({})", id);
@@ -95,6 +123,15 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
+   
+   
+   
+   
+   
+    @Operation(summary = "Update product by ID and web request body", description = """
+        Updates the details of an existing product identified by its unique ID.
+        Returns the updated product details if the update is successful, 
+        or a 404 Not Found status if no product exists with the specified ID.""")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
             @Valid @RequestBody ProductRequest request) {
@@ -104,6 +141,15 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productResponse);
     }
 
+    
+    
+    
+    
+    
+    @Operation(summary = "Delete product by ID", description = """
+        Deletes an existing product identified by its unique ID.
+        Returns a 204 No Content status if the deletion is successful,
+        or a 404 Not Found status if no product exists with the specified ID.""")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         logger.debug("Entering @DeleteMapping({})", id);
@@ -112,6 +158,16 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    
+    
+    
+    
+    
+    
+    
+    @Operation(summary = "Get products by category with pagination and sorting", description = """
+        Retrieves a paginated list of products that belong to the specified category.
+        Clients can specify page number, page size, sorting field, and sorting direction.""")
     @GetMapping("/category/{category}")
     public ResponseEntity<PaginationResponse<ProductResponse>> getProductsByCategory(
             @PathVariable ProductCategory category,
