@@ -26,5 +26,5 @@ jwt:
 app:
   pagination:
     slice-enabled-for:
-      - product  
+#      - product  
     

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.siju.ecommerce.category.ProductCategory;
@@ -29,6 +30,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// 🚀 This automatically appends "AND deleted = false" to ALL select queries (including findById!)
+// Use native SQL query for soft deleted records if you want to include them in the result set.
+@SQLRestriction("deleted = false")
 public class Product {
 
     @Id
@@ -63,6 +67,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
 
-    
+    @Column(nullable = false)
+    private boolean deleted;
 
 }

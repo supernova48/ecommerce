@@ -35,6 +35,7 @@ public class ProductService {
     public static final String PRODUCT = "product";
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
+    // --------------------------------------------------------------------
     @Transactional
     public ProductResponse createProduct(ProductRequest request) {
 
@@ -43,6 +44,7 @@ public class ProductService {
         return productMapper.toResponse(savedProduct);
     }
 
+    // --------------------------------------------------------------------
     public PaginationResponse<ProductResponse> getProducts(int pageNumber,
             int pageSize, String sortBy, String direction) {
 
@@ -83,6 +85,7 @@ public class ProductService {
                 productPage.isLast());
     }
 
+    // --------------------------------------------------------------------
     public PaginationResponse<ProductResponse> getProductsByName(String keyword,
             int pageNumber, int pageSize, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -104,6 +107,7 @@ public class ProductService {
 
     }
 
+    // --------------------------------------------------------------------
     @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
 
@@ -114,6 +118,7 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    // --------------------------------------------------------------------
     @Caching(evict = {
             @CacheEvict(value = "products", key = "#id")
 
@@ -134,16 +139,27 @@ public class ProductService {
         return productMapper.toResponse(updatedProduct);
     }
 
+    // --------------------------------------------------------------------
     @Caching(evict = {
             @CacheEvict(value = "products", key = "#id")
     })
+    @Transactional
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
         }
-        productRepository.deleteById(id);
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.setDeleted(true);
+        //Not necessary to call save() explicitly because the entity 
+        //is managed by hibernate and will be updated in the database at 
+        // the end of the transaction. But unit tests may need this because
+        // they may not run in a transaction and the entity may not be managed.
+        productRepository.save(product);
     }
 
+    // --------------------------------------------------------------------
     public PaginationResponse<ProductResponse> getProductsByCategory(
             ProductCategory category, int pageNumber,
             int pageSize, String sortBy, String direction) {
@@ -161,8 +177,10 @@ public class ProductService {
                 productPage.isLast());
     }
 
+    // --------------------------------------------------------------------
     private boolean useSlice(String tableName) {
         logger.debug("Slice enabled for tables: {}", sliceProperties.sliceEnabledFor());
         return sliceProperties.sliceEnabledFor().contains(tableName);
     }
+    // --------------------------------------------------------------------
 }

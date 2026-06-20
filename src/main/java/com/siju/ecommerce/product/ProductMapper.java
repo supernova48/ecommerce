@@ -1,29 +1,11 @@
 package com.siju.ecommerce.product;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
 
-@Component
-public class ProductMapper {
-    public ProductResponse toResponse(Product product) {
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getStockQuantity(),
-                product.getActive(),
-                product.getCategory());
-    }
+@Mapper(componentModel = "spring")
+public interface ProductMapper {
 
+    ProductResponse toResponse(Product product);
 
-    public Product toEntity(ProductRequest request) {
-        Product product = new Product();
-        product.setName(request.name());
-        product.setDescription(request.description());
-        product.setPrice(request.price());
-        product.setStockQuantity(request.stockQuantity());
-        product.setActive(request.active());
-        product.setCategory(request.category());
-        return product;
-    }
+    Product toEntity(ProductRequest request);
 }
